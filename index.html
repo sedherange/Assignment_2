@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      background-color: #222222;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      width: 300px;
+      text-align: center;
+    }
+
+    .login-container img {
+      width: 200px; /* Adjust the image width as needed */
+      height: auto; /* Maintain aspect ratio */
+      margin-bottom: 20px;
+    }
+
+    .login-container h2 {
+      color: #ffffff;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      margin-bottom: 5px;
+      color: #aaaaaa;
+    }
+
+    .form-group input {
+      padding: 8px;
+      border: 1px solid #444444;
+      border-radius: 4px;
+      color: #000000; /* Text color for input fields */
+    }
+
+    .login-btn {
+      padding: 10px;
+      background-color: #22FF00;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-container">
+  <img src="test-image.jpg" alt="Test Image">
+  <h2>Login</h2>
+  <form class="login-form" onsubmit="return validateForm()">
+    <div class="form-group">
+      <label for="username">Username (Email):</label>
+      <input type="text" id="username" name="username" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required>
+    </div>
+    <div class="form-group">
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" pattern="^(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@]+$" required>
+    </div>
+    <button type="submit" class="login-btn">Login</button>
+  <a href="#" class="forgot-password">Forgot Password?</a>
+
+  </form>
+</div>
+
+<script>
+  function validateForm() {
+    // You can add more sophisticated validation logic here
+    // For now, just return true to submit the form
+    return true;
+  }
+</script>
+
+</body>
+</html>
