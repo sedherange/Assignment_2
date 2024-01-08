@@ -3,98 +3,177 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Page</title>
+  <title>JSON Display</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #000000;
-      color: #ffffff;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+    table {
+      border-collapse: collapse;
+      width: 100%;
     }
-
-    .login-container {
-      background-color: #222222;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-      width: 300px;
-      text-align: center;
-    }
-
-    .login-container img {
-      width: 200px; /* Adjust the image width as needed */
-      height: auto; /* Maintain aspect ratio */
-      margin-bottom: 20px;
-    }
-
-    .login-container h2 {
-      color: #ffffff;
-    }
-
-    .login-form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .form-group label {
-      margin-bottom: 5px;
-      color: #aaaaaa;
-    }
-
-    .form-group input {
+    th, td {
+      border: 1px solid #dddddd;
+      text-align: left;
       padding: 8px;
-      border: 1px solid #444444;
-      border-radius: 4px;
-      color: #000000; /* Text color for input fields */
     }
+    .flex-container {
+      display: flex;
+      justify-content: space-between;
+    }
+    .select-box {
+      width: 150px;
+      height: 100px;
+   
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    text-align: centre;
+    border-collapse: collapse;  /* Ensure consistent borders */
+    border: 1px solid #ccc;
+    border-spacing: 5px;
+    background-color: #f5f5ff;
+  }
 
-    .login-btn {
-      padding: 10px;
-      background-color: #22FF00;
-      color: #ffffff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
+  th, td {
+    padding: 10px;
+    overflow-wrap: break-word; /* Prevent text overflow */
+  }
+
+  th {
+    font-weight: bold;
+    background-color: #ddd;
+  }
+
+  tr:nth-child(even) {
+    background-color: #e5e5e5;
+  }
+
+
+  }
   </style>
 </head>
 <body>
 
-<div class="login-container">
-  <img src="test-image.jpg" alt="Test Image">
-  <h2>Login</h2>
-  <form class="login-form" onsubmit="return validateForm()">
-    <div class="form-group">
-      <label for="username">Username (Email):</label>
-      <input type="text" id="username" name="username" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required>
-    </div>
-    <div class="form-group">
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" pattern="^(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@]+$" required>
-    </div>
-    <button type="submit" class="login-btn">Login</button>
-  <a href="#" class="forgot-password">Forgot Password?</a>
+<div class="flex-container">
+  <div>
+    <label for="fileInput">Step 1: Upload JSON File:</label><br>
+    <input type="file" id="fileInput" accept=".json">
+  </div>
 
-  </form>
+  <div>
+    <label for="availableFields">Step 2: Available Fields:</label><br>
+    <select id="availableFields" multiple class="select-box">
+      <option value="subcategory">Subcategory</option>
+      <option value="title" selected>Title</option>
+      <option value="price" selected>Price</option>
+      <option value="popularity" selected>Popularity</option>
+    </select>
+  </div>
+
+  <div><br>
+    <button onclick="moveOptions('availableFields', 'displayFields')"> >></button><br><br>
+    <button onclick="moveOptions('displayFields', 'availableFields')"> <<</button>
+  </div>
+
+  <div>
+    <label for="displayFields">Step 3: Fields to Display:</label><br>
+    <select id="displayFields" multiple class="select-box"></select>
+  </div>
 </div>
 
+<table id="dataTable">
+</table>
+
 <script>
-  function validateForm() {
-    // You can add more sophisticated validation logic here
-    // For now, just return true to submit the form
-    return true;
+  // Function to move selected options between two select boxes
+  function moveOptions(sourceId, targetId) {
+    const sourceSelect = document.getElementById(sourceId);
+    const targetSelect = document.getElementById(targetId);
+
+    Array.from(sourceSelect.options).forEach(option => {
+      if (option.selected) {
+        targetSelect.appendChild(option.cloneNode(true));
+        option.remove();
+      }
+    });
+
+    // Display table only if there are selected fields
+    const displayFields = document.getElementById('displayFields');
+    const table = document.getElementById('dataTable');
+
+    if (displayFields.options.length > 0) {
+      const selectedColumns = Array.from(displayFields.options).map(option => option.value);
+      displayTable(selectedColumns);
+      table.style.display = 'block';
+    } else {
+      table.style.display = 'none';
+    }
   }
+
+  // Function to display selected columns in the table
+  function displayTable(selectedColumns) {
+    jsonData = JSON.parse(localStorage.getItem('jsonData'))
+    const table = document.getElementById('dataTable');
+    table.innerHTML = '';
+
+    // Create table header
+    const headerRow = table.insertRow(0);
+    selectedColumns.forEach(column => {
+      const th = document.createElement('th');
+      th.textContent = column.charAt(0).toUpperCase() + column.slice(1); // Capitalize first letter
+      headerRow.appendChild(th);
+    });
+
+    // Sort the data based on descending popularity
+    const sortedData = Object.entries(jsonData.products)
+      .sort(([, a], [, b]) => b.popularity - a.popularity)
+      .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+
+    // Create table rows with sorted data
+    for (const productId in sortedData) {
+      const product = sortedData[productId];
+      const row = table.insertRow();
+
+      selectedColumns.forEach(column => {
+        const cell = row.insertCell();
+        cell.textContent = product[column];
+      });
+    }
+  }
+  
+  // Event listener for file input change
+  document.getElementById('fileInput').addEventListener('change', function () {
+    const fileInput = this;
+    const file = fileInput.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        try {
+          const jsonData = JSON.parse(e.target.result);
+          localStorage.setItem('jsonData',JSON.stringify(jsonData))
+          const initialColumns = Array.from(document.getElementById('availableFields').options).map(option => option.value);
+          displayTable(initialColumns);
+        } catch (error) {
+          console.error('Error parsing JSON file:', error);
+        }
+      };
+
+      reader.readAsText(file);
+    }
+  });
+
+  // Event listener for column selection change
+  document.getElementById('displayFields').addEventListener('change', function () {
+    const displayFields = this;
+    const table = document.getElementById('dataTable');
+
+    if (displayFields.options.length > 0) {
+      const selectedColumns = Array.from(displayFields.options).map(option => option.value);
+      displayTable(selectedColumns);
+      table.style.display = 'block';
+    } else {
+      table.style.display = 'none';
+    }
+  });
 </script>
 
 </body>
